@@ -1,0 +1,111 @@
+*{
+	margin: 0rem;
+	padding: 0rem;
+	box-sizing: border-box;
+	font-family: sans-serif;
+}
+
+.grafico {
+	background-color: #ffffff42;
+    padding-top: 20px;
+    border-radius: 20px;
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	width: 40%;
+	height: 70%;
+	bottom: 20px;
+	right: 70%;
+	left: 30%;
+}
+.contenedor {
+	justify-content: center;
+	position: relative;
+	width: 100%;
+	height: 100vh;
+}
+.datos{
+	justify-content: center;
+	display: flex;
+	width: 100%;
+	height: 40%;
+}
+.botones{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 10%;
+	gap: 20px;
+}
+.button {
+	height: 40px;
+	color: black;
+	padding: 10px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	cursor: pointer;
+
+}
+.titulo{
+	font-size: 13px;
+	text-align: center;
+	font-weight: 600;
+	font-family: 'Ubuntu', sans-serif;
+}
+.int{
+	width: 100%;
+	text-align: center;
+	font-size: 75px;
+}
+.cont{
+	width: 100%;
+	height: 50%;
+}
+
+.datitos{
+	justify-content: center;
+	display: flex;
+	width: 100%;
+	height: 20%;
+}
+.max{
+	text-align: center;
+	height: 100%;
+	width: 25%;
+}
+.min{
+	text-align: center;
+	height: 100%;
+	width: 25%;
+}
+.hidden {
+    display: none;
+}
+.continente{
+	position: relative;
+	justify-content: center;
+	width: 100%;
+	height: 75%;
+}
+.fuegos1{
+	position: relative;
+	height: 100%;
+	width: 100%;
+}
+.cont1{
+	position: absolute;
+	left: 0;
+	text-align: center;
+	width: 50%;
+	height: 100%;
+}
+.cont2{
+	position: absolute;
+	text-align: center;
+	right: 0;
+	width: 50%;
+	height: 100%;
+}

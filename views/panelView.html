@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Panel</title>
+
+	<link rel="stylesheet" type="text/css" href="views/static/css/vars.css">
+	<link rel="stylesheet" type="text/css" href="views/static/css/panel.css">
+	
+</head>
+<body>
+
+
+	<div class="contenedor">
+		<header>
+			<div class="titulo">Estaciones</div>
+		</header>
+		<div class="estaciones">
+			<template id="estacion">
+				<a href="" class="card">				
+					<div class="title item">
+						<p class="txt_apodo">
+							apodo
+						</p>
+					</div>
+					<div class="data">
+						<div class="ubicacion">
+							<p>Ubicacion:</p>
+							<p class="txt_ubicacion"></p>
+						</div>
+						<div class="visitas">
+							<img src="img/system/user.png" alt="" class="user">
+							<p class="txt_visitas"></p>
+						</div>
+					</div>
+					
+					<div class="inactivo"></div>	
+				</a>
+	 		</template>
+	 		<div id="estacion1">
+	 			
+	 		</div>
+	 		
+		</div>
+	</div>
+
+	<script type="text/javascript">
+
+		getStations().then( data => {
+			data.forEach( row  => {
+				addStation(row);
+			});
+		})
+
+		function addStation(data){
+			const tpl = estacion.content;
+			const clon = tpl.cloneNode(true);
+			clon.querySelector(".txt_apodo").textContent = data.apodo;
+			clon.querySelector(".txt_ubicacion").textContent = data.ubicacion;
+			clon.querySelector(".txt_visitas").textContent = data.visitas;
+			if (data.dias_inactivo==0) {
+				clon.querySelector(".inactivo").style.display = 'none';
+			} else {
+				clon.querySelector(".inactivo").innerHTML = 'inactivo';
+			}
+			clon.querySelector(".card").href = "detalle/"+data.chipid;
+			estacion1.appendChild(clon);
+		}
+
+		async function getStations(){
+			const response = await fetch("https://mattprofe.com.ar/proyectos/app-estacion/datos.php?mode=list-stations");
+			const data = await response.json();
+			return data;
+		}
+
+	</script>
+	
+</body>
+</html>

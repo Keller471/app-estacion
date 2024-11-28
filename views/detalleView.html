@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Detalle</title>
+	<link rel="stylesheet" type="text/css" href="../views/static/css/panel.css">
+	<link rel="stylesheet" type="text/css" href="../views/static/css/detalle.css">
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+	<div class="contenedor">
+		<header>
+			<div class="titulo">Estacion {{CHIPID}}</div>
+		</header>
+
+		<!-- Contenedor del gráfico -->
+		<div class="botones">
+			<button class="button" id="temperatura" onclick="temperatura()" class="boton">Temperatura</button>
+			<button class="button" id="humedad" onclick="humedad()" class="boton">Humedad</button>
+			<button class="button" id="fuego" onclick="fuego()" class="boton">Fuego</button>
+			<button class="button" id="presion" onclick="presion()" class="boton">Presion</button>
+			<button class="button" id="viento" onclick="viento()" class="boton">viento</button>
+		</div>
+		<div class="grafico">
+			<div class="datos">
+				<div id="cont1" class="cont">
+					<div id="titulo1" class="titulo">TEMPERATURA</div>
+					<div id="int1" class="int">00</div>
+					<div id="datitos1" class="datitos">
+						<div class="max">
+							<div class="title">maxima</div>
+							<div id="max1" class="max-int">00</div>
+						</div>
+						<div class="min">
+							<div class="title">minima</div>
+							<div id="min1" class="min-int">00</div>
+						</div>
+					</div>
+					<div id="datosfuego" class="fuegos1 hidden">
+						<div class="cont1">
+						<div class="fuegos">
+							<div class="title">FFMC</div>
+							<div id="FFMC" class="max-int">00</div>
+						</div>
+						<div class="fuegos">
+							<div class="title">DMC</div>
+							<div id="DMC" class="max-int">00</div>
+						</div>
+						<div class="fuegos">
+							<div class="title">DC</div>
+							<div id="DC" class="max-int">00</div>
+						</div>
+						</div>
+						<div class="cont2">
+						<div class="fuegos">
+							<div class="title">ISI</div>
+							<div id="ISI" class="max-int">00</div>
+						</div>
+						<div class="fuegos">
+							<div class="title">BUI</div>
+							<div id="BUI" class="max-int">00</div>
+						</div>
+						<div class="fuegos">
+							<div class="title">FWI</div>
+							<div id="FWI" class="max-int">00</div>
+						</div>
+						</div>
+					</div>
+				</div>
+				<div id="cont2" class="cont">
+					<div id="titulo2" class="titulo">SENSACION</div>
+					<div id="int2" class="int">00</div>
+					<div id="datito2" class="datitos">
+						<div class="max">
+							<div class="title">maxima</div>
+							<div id="max2" class="max-int">00</div>
+						</div>
+						<div class="min">
+							<div class="title">minima</div>
+							<div id="min2" class="min-int">00</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<canvas id="grafico-dolar" style="width: 100%; height: 60%;"></canvas>
+		</div>
+		<script type="text/javascript">
+			let grafico;
+			let tempe = [];
+			let humed = [];
+			let vient = [];
+			let presi = [];
+            let fueg = [];
+			let valortitulo = document.querySelector("#titulo1")
+			let valortitulo2 = document.querySelector("#titulo2")
+			let humedadact;
+			let presiact;
+			let tempact;
+			let maxtemp;
+			let mintemp;
+			let sensact;
+			let maxsens;
+			let minsens;
+			let vientoact;
+			let maxviento;
+			let valorint1 = document.querySelector("#int1")
+			let valormax1 = document.querySelector("#max1")
+			let valormin1 = document.querySelector("#min1")
+			let valorint2 = document.querySelector("#int2")
+			let valormax2 = document.querySelector("#max2")
+			let valormin2 = document.querySelector("#min2")
+			let valorffmc = document.querySelector("#FFMC")
+			let valordmc = document.querySelector("#DMC")
+			let valordc = document.querySelector("#DC")
+			let valorisi = document.querySelector("#ISI")
+			let valorbui = document.querySelector("#BUI")
+			let valorfwi = document.querySelector("#FWI")
+			document.addEventListener("DOMContentLoaded", () => {	
+				
+				
+
+			// Leemos los datos del JSON
+				loadDatos("https://mattprofe.com.ar/proyectos/app-estacion/datos.php?chipid={{CHIPID}}&cant=7").then( data => {
+
+				// llamamos a la función que ordena los datos de un registro y genera el gráfico
+					procesaDatos(data)
+
+				})
+			})
+			function procesaDatos(datos){
+
+			// vectores para almacenar los valores del gráfico
+				let periodo	= [];
+				
+
+			// recorremos datos
+				for (let i = datos.length-1; i >= 0; i--) {
+				// Agregamos el nuevo dato como una posición dentro del vector
+					periodo.push(datos[i].fecha.slice(11, 16))
+					tempe.push(datos[i].temperatura)
+					humed.push(datos[i].humedad)
+					vient.push(datos[i].viento)
+					presi.push(datos[i].presion);
+                    fueg.push(datos[i].fwi);
+					if(i == 0){
+						valorint1.innerHTML = datos[i].temperatura + "º"
+						valormax1.innerHTML = datos[i].tempmax + "º"
+						valormin1.innerHTML = datos[i].tempmin + "º"
+						valorint2.innerHTML = datos[i].sensacion + "º"
+						valormax2.innerHTML = datos[i].sensamax + "º"
+						valormin2.innerHTML = datos[i].sensamin + "º"
+						valorffmc.innerHTML = datos[i].ffmc
+						valordmc.innerHTML = datos[i].dmc
+						valordc.innerHTML = datos[i].dc
+						valorisi.innerHTML = datos[i].isi
+						valorbui.innerHTML = datos[i].bui
+						valorfwi.innerHTML = datos[i].fwi
+						maxtemp = datos[i].tempmax
+						mintemp = datos[i].tempmin
+						sensact = datos[i].sensacion
+						maxsens = datos[i].sensamax
+						minsens = datos[i].sensamin
+						humedadact = datos[i].humedad
+						tempact = datos[i].temperatura
+						vientoact = datos[i].viento
+						maxviento = datos[i].maxviento
+						presiact = datos[i].presion
+					}
+				}
+
+			// Valores que se grafican
+				const valores = {
+					labels: periodo,
+					datasets: [{
+						label: 'Temperatura',
+					backgroundColor: 'rgb(187 33 10)', // color circulo
+					borderColor: 'rgb(187 33 10)', // color linea
+					data: tempe // valores a graficar
+				}]
+				}
+
+			// muestra el gráfico con el título
+				pintaGrafico(valores)
+			}
+
+
+		// muestra el gráfico
+			function pintaGrafico(valores){
+			// Opciones generales del gráfico
+				const options = {
+				indexAxis: 'x', // Orden de los ejes del gráfico
+				plugins: {
+					legend: {
+                		display: false // Desactiva la leyenda si no la necesitas
+                	},
+                },
+                animation: {
+                	duration: 0
+                },
+                responsive: true,
+                responsiveAnimationDuration: 0,
+                scales: {
+                	x: {
+                		beginAtZero: true,
+                	},
+                	y: {
+                beginAtZero: true, // Asegura que el eje Y comience en 0
+                min: 0, // Configura el valor mínimo del eje Y
+                
+
+            }
+        }
+    }
+
+			// Información con la cual se genera el gráfico
+    const config = {
+    	type: 'line',
+    	data: valores,
+    	options: options
+    }
+
+			// Crea el gráfico dentro del canvas
+    grafico = new Chart(document.querySelector("#grafico-dolar"), config)
+}
+
+
+async function getStations(){
+	const response = await fetch("https://mattprofe.com.ar/proyectos/app-estacion/datos.php?mode=list-stations");
+	const data = await response.json();
+	return data;
+}
+async function loadDatos(url){
+	const response = await fetch(url)
+	const data = await response.json()
+
+	return data
+}
+function humedad() {
+	document.querySelector('#cont2').classList.add('hidden');
+	document.querySelector('#datitos1').classList.add('hidden');
+	document.querySelector('#datosfuego').classList.add('hidden');
+	valortitulo.innerHTML = "HUMEDAD"
+	valorint1.innerHTML = humedadact + "%"
+	grafico.data.datasets[0].data = humed;
+	grafico.data.datasets[0].label = 'Humedad';
+	grafico.data.datasets[0].backgroundColor = 'rgb(7 143 235)';
+	grafico.data.datasets[0].borderColor = 'rgb(7 143 235)';
+		    grafico.update(); // Actualiza el gráfico
+		}
+		function temperatura() {
+			document.querySelector('#cont2').classList.remove('hidden');
+			document.querySelector('#datitos1').classList.remove('hidden');
+			document.querySelector('.min').classList.remove('hidden');
+			document.querySelector('#datosfuego').classList.add('hidden');
+			valormax1.innerHTML = maxtemp + "º"
+			valormin1.innerHTML = mintemp + "º"
+			valorint2.innerHTML = sensact + "º"
+			valormax2.innerHTML = maxsens + "º"
+			valormin2.innerHTML = minsens + "º"
+			valortitulo2.innerHTML = "SENSACION"
+			valortitulo.innerHTML = "TEMPERATURA"
+			valorint1.innerHTML = tempact + "º"
+			grafico.data.datasets[0].data = tempe;
+			grafico.data.datasets[0].label = 'Temperatura';
+			grafico.data.datasets[0].backgroundColor = 'rgb(187 33 10)';
+			grafico.data.datasets[0].borderColor = 'rgb(187 33 10)';
+		    grafico.update(); // Actualiza el gráfico
+		}
+		function viento() {
+			document.querySelector('#cont2').classList.add('hidden');
+			document.querySelector('#datitos1').classList.remove('hidden');
+			document.querySelector('.min').classList.add('hidden');
+			document.querySelector('#datosfuego').classList.add('hidden');
+			valormax1.innerHTML = maxviento + "kmh"
+			valortitulo.innerHTML = "VIENTO"
+			valorint1.innerHTML = vientoact + "kmh"
+			grafico.data.datasets[0].data = vient;
+			grafico.data.datasets[0].label = 'Temperatura';
+			grafico.data.datasets[0].backgroundColor = 'lightgreen';
+			grafico.data.datasets[0].borderColor = 'lightgreen';
+		    grafico.update(); // Actualiza el gráfico
+		}
+		function fuego() {
+                document.querySelector('#cont2').classList.add('hidden');
+                document.querySelector('#datitos1').classList.add('hidden');
+                document.querySelector('#datosfuego').classList.remove('hidden');
+                
+                valortitulo.innerHTML = "FUEGO";
+                valorint1.innerHTML = fireDanger(fueg[fueg.length - 1]);
+                grafico.data.datasets[0].data = fueg;
+                grafico.data.datasets[0].label = 'Fuego';
+                grafico.data.datasets[0].backgroundColor = 'orange';
+                grafico.data.datasets[0].borderColor = 'orange';
+                grafico.update(); // Actualiza el gráfico
+            }
+
+            function presion() {
+                document.querySelector('#cont2').classList.add('hidden');
+                document.querySelector('#datitos1').classList.add('hidden');
+                document.querySelector('#datosfuego').classList.add('hidden');
+                valortitulo.innerHTML = "PRESIÓN";
+                valorint1.innerHTML = presiact + " hPa";
+                grafico.data.datasets[0].data = presi;
+                grafico.data.datasets[0].label = 'Presión';
+                grafico.data.datasets[0].backgroundColor = 'blue';
+                grafico.data.datasets[0].borderColor = 'blue';
+                grafico.update(); // Actualiza el gráfico
+            }
+		function fireDanger(fwi){
+			let fwiFloat = parseFloat(fwi)
+
+			if(fwiFloat>=50){
+				return "Extremo"
+			}else{
+				if(fwiFloat>=38){
+					return "Muy alto"
+				}else{
+					if(fwiFloat>=21.3){
+						return "Alto"
+					}else{
+						if(fwiFloat>=11.2){
+							return "Moderado"
+						}else{
+							if(fwiFloat>=5.2){
+								return "Bajo"
+							}else{
+								return "Muy bajo"
+							}
+						}
+					}
+				}
+			}
+
+		}
+    </script>
+</body>
+</html>
